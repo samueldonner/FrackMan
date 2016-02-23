@@ -77,6 +77,7 @@ void StudentWorld::clearDirt(int startX, int startY)
             if(dirtArray[i][j]!=nullptr)
             {
                 delete dirtArray[i][j];
+                playSound(SOUND_DIG);
                 dirtArray[i][j]=nullptr;
             }
         }

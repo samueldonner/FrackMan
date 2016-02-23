@@ -133,27 +133,31 @@ void FrackMan::move()
             switch(ch)
             {
                 case KEY_PRESS_LEFT:
-                    if( directionMoving == left )
+                    if( directionMoving == left && x!=0 )
                         moveTo(x-1, y);
                     else
+                        moveTo(x, y);
                         setDirection(left);
                     break;
                 case KEY_PRESS_RIGHT:
-                    if( directionMoving == right )
+                    if( directionMoving == right && x!=60 )
                         moveTo(x+1, y);
                     else
+                        moveTo(x, y);
                         setDirection(right);
                     break;
                 case KEY_PRESS_DOWN:
-                    if( directionMoving == down )
+                    if( directionMoving == down && y!=0 )
                         moveTo(x, y-1);
                     else
+                        moveTo(x, y);
                         setDirection(down);
                     break;
                 case KEY_PRESS_UP:
-                    if( directionMoving == up )
+                    if( directionMoving == up && y!=60 )
                         moveTo(x , y+1);
                     else
+                        moveTo(x, y);
                         setDirection(up);
                     break;
                 case KEY_PRESS_SPACE:
@@ -168,7 +172,6 @@ void FrackMan::move()
         
     }
     getWorld()->clearDirt(x, y);
-    //getWorld()->playSound(SOUND_DIG);
 
 }
 
