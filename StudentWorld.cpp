@@ -22,7 +22,7 @@ StudentWorld::StudentWorld(string assetDir)
 int StudentWorld::init()
 {
     fmPointer = new FrackMan(this, 30, 60);
-    //boulderPointer = new Boulder( this, 20,50 );
+    boulderPointer = new Boulder( this, 20,50 );
     for(int i = 0; i<VIEW_WIDTH; i++)
         for(int j = 0; j<VIEW_HEIGHT-4; j++)
         {
@@ -60,12 +60,12 @@ int StudentWorld::move()
     fmPointer->keyEvent(pressKey);
     fmPointer->move();
     
-    /*int boulderY = boulderPointer->getY();
-    int boulderX = boulderPointer->getX();*/
-    //if(canActorMoveTo(boulderX,boulderY))
-    //{
-    //    boulderPointer->move();
-    //}
+    int boulderY = boulderPointer->getY();
+    int boulderX = boulderPointer->getX();
+    if(canActorMoveTo(boulderPointer, boulderX,boulderY))
+    {
+        boulderPointer->move();
+    }
     
     return GWSTATUS_CONTINUE_GAME;
 }
