@@ -28,7 +28,7 @@ public:
     void addActor(Actor* a);
     
     // Clear a 4x4 region of dirt.
-    void clearDirt(int x, int y);
+    void clearDirt(int x, int y);  // DONE!!!
     
     // Can actor move to x,y?
     bool canActorMoveTo(Actor* a, int x, int y) const;

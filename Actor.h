@@ -18,16 +18,16 @@ public:
     virtual void move() = 0;
     
     // Is this actor alive?
-    bool isAlive() const;
+    bool isAlive() const; // DONE!!
     
     // Mark this actor as dead.
-    void setDead();
+    void setDead(); // DONE!!
     
     // Annoy this actor.
     virtual bool annoy(unsigned int amt);
     
     // Get this actor's world
-    StudentWorld* getWorld() const;
+    StudentWorld* getWorld() const; // DONE!!
     
     // Can other actors pass through this actor?
     virtual bool canActorsPassThroughMe() const;

@@ -125,6 +125,34 @@ void FrackMan::move()
     else
     {
         Direction directionMoving = getDirection();
+        
+        int ch = directionMoving;
+        if (getWorld()->getKey(ch) == true)
+        {
+            // user hit a key this tick! switch (ch)
+            switch(ch)
+            {
+                case KEY_PRESS_LEFT:
+                    moveTo(x-1, y);
+                    break;
+                case KEY_PRESS_RIGHT:
+                    moveTo(x+1, y);
+                    break;
+                case KEY_PRESS_DOWN:
+                    moveTo(x, y-1);
+                    break;
+                case KEY_PRESS_UP:
+                    moveTo(x , y+1);
+                    break;
+                case KEY_PRESS_SPACE:
+                    //TODO:
+                    break;
+                case KEY_PRESS_TAB:
+                    //TODO:
+                    break;
+            } // end switch
+        }// end if
+        
         if(makingMove == true)
         {
             
@@ -173,6 +201,7 @@ void FrackMan::move()
         makingMove = true;
     }
     getWorld()->clearDirt(x, y);
+
 }
 
 void FrackMan::keyEvent(int key)
@@ -274,6 +303,3 @@ bool Boulder::canActorsPassThroughMe() const
 {
     return true;
 }
-
-
-
