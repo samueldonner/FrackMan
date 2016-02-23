@@ -35,6 +35,8 @@ int StudentWorld::init()
             
         }
     boulderPointer = new Boulder( this, 20,50 );
+    
+    //boulderPointer = new Boulder( this, 20,10 );
     return GWSTATUS_CONTINUE_GAME;
 }
 
@@ -57,9 +59,31 @@ int StudentWorld::move()
     
     fmPointer->move();
     
-    boulderPointer->move();
+    if( boulderPointer->isAlive())
+        boulderPointer->move();
     
     return GWSTATUS_CONTINUE_GAME;
+}
+
+void StudentWorld::removeDirt(int startX, int startY)
+{
+    int endY = startY+3;
+    int endX = startX+3;
+    if(endY>=59)
+        endY = 59;
+    if(endX>= 63)
+        endX = 63;
+    for(int i = startX; i<= endX; i++)
+    {
+        for(int j = startY; j<= endY; j++)
+        {
+            if(dirtArray[i][j]!=nullptr)
+            {
+                delete dirtArray[i][j];
+                dirtArray[i][j]=nullptr;
+            }
+        }
+    }
 }
 
 void StudentWorld::clearDirt(int startX, int startY)
@@ -77,8 +101,8 @@ void StudentWorld::clearDirt(int startX, int startY)
             if(dirtArray[i][j]!=nullptr)
             {
                 delete dirtArray[i][j];
-                playSound(SOUND_DIG);
                 dirtArray[i][j]=nullptr;
+                playSound(SOUND_DIG);
             }
         }
     }
@@ -86,17 +110,22 @@ void StudentWorld::clearDirt(int startX, int startY)
 
 bool StudentWorld::canActorMoveTo(Actor* a, int posX, int posY) const
 {
-    bool theresNoDirt = true;
+    bool canActorMove = true;
     
     for(int i = posX; i<= posX+3; i++)
     {
-            if(dirtArray[i][posY]!=nullptr)
+            if(dirtArray[i][posY-1]!=nullptr)
             {
-                theresNoDirt = false;
+                canActorMove = false;
                 break;
             }
     }
-    return theresNoDirt;
+    if(posY <= 0 || posY >= 59 || posX <= 0 || posX >= 63)
+    {
+        canActorMove = false;
+    }
+
+    return canActorMove;
 }
 
 StudentWorld::~StudentWorld()

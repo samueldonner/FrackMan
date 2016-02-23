@@ -66,8 +66,6 @@ public:
     
     virtual bool annoy(unsigned int amount);
     virtual bool canPickThingsUp() const;
-private:
-    
 };
 
 class FrackMan : public Agent
@@ -145,6 +143,9 @@ public:
     Boulder(StudentWorld* world, int startX, int startY);
     virtual void move();
     virtual bool canActorsPassThroughMe() const;
+private:
+    int m_state;
+    int m_waitCounter;
 };
 
 class Squirt : public Actor

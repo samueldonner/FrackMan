@@ -248,46 +248,48 @@ void Dirt::move()
 Boulder::Boulder(StudentWorld* world, int startX, int startY)
 :Actor(world, startX, startY, down, true, IID_BOULDER, 1, 1)
 {
-    world->clearDirt(startX, startY);
+    world->removeDirt(startX, startY);
+    m_state = 1;
+    m_waitCounter = 0;
 }
 
 void Boulder::move()
 {
     int x = getX();
     int y = getY();
-    int state = 1;
     //1 = stable // 2 = waiting // 3 = falling
     if(!isAlive()) //Boulder is not alive
         return;
     else
     {
-        if(state == 1)
+        if(m_state == 1)
         {
             if(getWorld()->canActorMoveTo(this, getX(), getY()))
             {
-               state = 2;
+                m_state = 2;
+                return;
             }
         }
-        if( state == 2 )
+        if( m_state == 2 )
         {
-            int i = 0;
-            while( i < 30 )
+            while( m_waitCounter < 30 )
             {
-                moveTo(x,y);
-                i++;
+                m_waitCounter++;
+                return;
             }
-            state = 3;
+            m_state = 3;
             getWorld()->playSound(SOUND_FALLING_ROCK);
         }
-        if( state == 3 )
+        if( m_state == 3 )
         {
-            if(getWorld()->canActorMoveTo(this, getX(), getY())) // runs into the top of another boulder
+            if(getWorld()->canActorMoveTo(this, getX(), getY()) && getY() >=0) // runs into the top of another boulder
             {
                 moveTo(x,y-1);
             }
             else
             {
                 this->setDead();
+                delete this;
             }
         }
     }
