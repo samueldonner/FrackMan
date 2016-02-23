@@ -1,6 +1,9 @@
 #include "StudentWorld.h"
+#include "Actor.h"
 #include <string>
 #include <iostream>
+#include <sstream>  // defines the type std::ostringstream
+#include <iomanip>  // defines the manipulator setw
 using namespace std;
 
 GameWorld* createStudentWorld(string assetDir)
@@ -18,12 +21,12 @@ StudentWorld::StudentWorld(string assetDir)
 
 int StudentWorld::init()
 {
-    fmPointer = new FrackMan(30, 60);
-    boulderPointer = new Boulder( 20,50 );
+    fmPointer = new FrackMan(this, 30, 60);
+    //boulderPointer = new Boulder( this, 20,50 );
     for(int i = 0; i<VIEW_WIDTH; i++)
         for(int j = 0; j<VIEW_HEIGHT-4; j++)
         {
-            dirtArray[i][j] = new Dirt(i, j);
+            dirtArray[i][j] = new Dirt(this, i, j);
             if(!(i < 30 || i > 33 || j<4)) //shaft created between x values 30-33 and less than 4
             {
                 delete dirtArray[i][j];
@@ -36,26 +39,43 @@ int StudentWorld::init()
 
 int StudentWorld::move()
 {
+    int score = 321000;
+    int level = 52;
+    int lives = 3;
+    int health = 80;
+    int water = 20;
+    int gold = 3;
+    int sonar = 1;
+    int oilLeft = 2;
+    ostringstream gameStats;
+    gameStats << "Scr: " << score <<  " Lvl: " << level << " Lives: " << lives
+            << " Hlth: " << health << "%" << " Wtr: " << water << " Gld: "
+            << gold << " Sonar: " << sonar << " Oil Left: " << oilLeft;
+    string s = gameStats.str();
+    setGameStatText(s);
+    
+    
     int pressKey;
-    int frackManY = fmPointer->getY();
-    int frackManX = fmPointer->getX();
-    int boulderY = boulderPointer->getY();
-    int boulderX = boulderPointer->getX();
     getKey(pressKey);
     fmPointer->keyEvent(pressKey);
-    fmPointer->doSomething();
-    if(noDirt(boulderX,boulderY))
-    {
-        boulderPointer->doSomething();
-    }
-    removeDirt(frackManX, frackManY, frackManX+3, frackManY+3);
+    fmPointer->move();
+    
+    /*int boulderY = boulderPointer->getY();
+    int boulderX = boulderPointer->getX();*/
+    //if(canActorMoveTo(boulderX,boulderY))
+    //{
+    //    boulderPointer->move();
+    //}
+    
     return GWSTATUS_CONTINUE_GAME;
 }
 
-void StudentWorld::removeDirt(int startX, int startY, int endX, int endY)
+void StudentWorld::clearDirt(int startX, int startY)
 {
-    if(endY>= 59)
-        endY = 59;
+    int endY = startY+3;
+    int endX = startX+3;
+    if(endY>=59)
+         endY = 59;
     if(endX>= 63)
         endX = 63;
     for(int i = startX; i<= endX; i++)
@@ -72,7 +92,7 @@ void StudentWorld::removeDirt(int startX, int startY, int endX, int endY)
     }
 }
 
-bool StudentWorld::noDirt(int posX, int posY)
+bool StudentWorld::canActorMoveTo(Actor* a, int posX, int posY) const
 {
     bool theresNoDirt = true;
     
