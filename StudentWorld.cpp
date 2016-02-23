@@ -22,7 +22,7 @@ StudentWorld::StudentWorld(string assetDir)
 int StudentWorld::init()
 {
     fmPointer = new FrackMan(this, 30, 60);
-    boulderPointer = new Boulder( this, 20,50 );
+    
     for(int i = 0; i<VIEW_WIDTH; i++)
         for(int j = 0; j<VIEW_HEIGHT-4; j++)
         {
@@ -34,6 +34,7 @@ int StudentWorld::init()
             }
             
         }
+    boulderPointer = new Boulder( this, 20,50 );
     return GWSTATUS_CONTINUE_GAME;
 }
 
@@ -54,18 +55,9 @@ int StudentWorld::move()
     string s = gameStats.str();
     setGameStatText(s);
     
-    
-    int pressKey;
-    getKey(pressKey);
-    fmPointer->keyEvent(pressKey);
     fmPointer->move();
     
-    int boulderY = boulderPointer->getY();
-    int boulderX = boulderPointer->getX();
-    if(canActorMoveTo(boulderPointer, boulderX,boulderY))
-    {
-        boulderPointer->move();
-    }
+    boulderPointer->move();
     
     return GWSTATUS_CONTINUE_GAME;
 }
@@ -86,7 +78,6 @@ void StudentWorld::clearDirt(int startX, int startY)
             {
                 delete dirtArray[i][j];
                 dirtArray[i][j]=nullptr;
-                playSound(SOUND_DIG);
             }
         }
     }

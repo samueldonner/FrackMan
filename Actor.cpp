@@ -133,16 +133,28 @@ void FrackMan::move()
             switch(ch)
             {
                 case KEY_PRESS_LEFT:
-                    moveTo(x-1, y);
+                    if( directionMoving == left )
+                        moveTo(x-1, y);
+                    else
+                        setDirection(left);
                     break;
                 case KEY_PRESS_RIGHT:
-                    moveTo(x+1, y);
+                    if( directionMoving == right )
+                        moveTo(x+1, y);
+                    else
+                        setDirection(right);
                     break;
                 case KEY_PRESS_DOWN:
-                    moveTo(x, y-1);
+                    if( directionMoving == down )
+                        moveTo(x, y-1);
+                    else
+                        setDirection(down);
                     break;
                 case KEY_PRESS_UP:
-                    moveTo(x , y+1);
+                    if( directionMoving == up )
+                        moveTo(x , y+1);
+                    else
+                        setDirection(up);
                     break;
                 case KEY_PRESS_SPACE:
                     //TODO:
@@ -153,71 +165,14 @@ void FrackMan::move()
             } // end switch
         }// end if
         
-        if(makingMove == true)
-        {
-            
-            if(directionMoving == down)
-            {
-                if(y!=0)
-                {
-                    moveTo(x, y-1);
-                    makingMove = false;
-                }
-                else
-                    moveTo(x,y);
-            }
-            else if(directionMoving == right)
-            {
-                if(x!=60)
-                {
-                    moveTo(x+1, y);
-                    makingMove = false;
-                }
-                else
-                    moveTo(x,y);
-            }
-            else if(directionMoving == left)
-            {
-                if( x!=0 )
-                {
-                    moveTo(x-1, y);
-                    makingMove = false;
-                }
-                else
-                    moveTo(x,y);
-            }
-            else if(directionMoving == up)
-            {
-                if(y!=60)
-                {
-                    moveTo(x , y+1);
-                    makingMove = false;
-                }
-                else
-                    moveTo(x,y);
-            }
-            
-        }
-        makingMove = true;
+        
     }
     getWorld()->clearDirt(x, y);
+    //getWorld()->playSound(SOUND_DIG);
 
 }
 
-void FrackMan::keyEvent(int key)
-{
-    makingMove = true;
-    if(key == KEY_PRESS_LEFT)
-        setDirection(left);
-    else if(key == KEY_PRESS_UP)
-        setDirection(up);
-    else if(key == KEY_PRESS_DOWN)
-        setDirection(down);
-    else if(key == KEY_PRESS_RIGHT)
-        setDirection(right);
-    else
-        makingMove = false;
-}
+
 
 bool FrackMan::annoy(unsigned int amount)
 {
@@ -290,16 +245,53 @@ void Dirt::move()
 Boulder::Boulder(StudentWorld* world, int startX, int startY)
 :Actor(world, startX, startY, down, true, IID_BOULDER, 1, 1)
 {
+    world->clearDirt(startX, startY);
 }
 
 void Boulder::move()
 {
     int x = getX();
     int y = getY();
-    moveTo(x,y-1);
+    int state = 1;
+    //1 = stable // 2 = waiting // 3 = falling
+    if(!isAlive()) //Boulder is not alive
+        return;
+    else
+    {
+        if(state == 1)
+        {
+            if(getWorld()->canActorMoveTo(this, getX(), getY()))
+            {
+               state = 2;
+            }
+        }
+        if( state == 2 )
+        {
+            int i = 0;
+            while( i < 30 )
+            {
+                moveTo(x,y);
+                i++;
+            }
+            state = 3;
+            getWorld()->playSound(SOUND_FALLING_ROCK);
+        }
+        if( state == 3 )
+        {
+            if(getWorld()->canActorMoveTo(this, getX(), getY())) // runs into the top of another boulder
+            {
+                moveTo(x,y-1);
+            }
+            else
+            {
+                this->setDead();
+            }
+        }
+    }
+    
 }
 
 bool Boulder::canActorsPassThroughMe() const
 {
-    return true;
+    return false;
 }
