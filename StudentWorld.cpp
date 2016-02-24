@@ -24,6 +24,46 @@ StudentWorld::StudentWorld(string assetDir)
     currentLevel = 0;
 }
 
+void randomXY( int &randomX, int &randomY)
+{
+    randomX = rand()%(VIEW_WIDTH-3);
+    randomY = rand()% (VIEW_HEIGHT - 7);
+    while(randomX > 26 && randomX < 34 && randomY > 0)
+    {
+        randomX = rand()%(VIEW_WIDTH-4);
+    }
+}
+
+bool moreThanSix(int xPosition, int yPosition, Actor* object2)
+{
+    double distanceX = (xPosition-object2->getX())*(xPosition-object2->getX());
+    double distanceY = (yPosition-object2->getY())*(yPosition-object2->getY());
+    double distance = sqrt(distanceX + distanceY);
+    if(distance <= 6)
+    {
+        return false;
+    }
+    return true;
+}
+
+void chooseXY( int &randomX, int &randomY, vector<Actor*> itemVector)
+{
+    if(itemVector.size()>1)
+    {
+        int index =0;
+        while( index < itemVector.size() )
+        {
+            while( !moreThanSix(randomX, randomY, itemVector[index]) )
+            {
+                randomXY(randomX, randomY);
+                index = 0;
+            }
+            index++;
+        }
+    }
+}
+
+
 int StudentWorld::init()
 {
     fmPointer = new FrackMan(this, 30, 60);
@@ -46,22 +86,31 @@ int StudentWorld::init()
     
     for( int i = 0; i < B; i++ )
     {
-        int randomX = rand()%(VIEW_WIDTH-4);
-        int randomY = rand()% (VIEW_HEIGHT - 8);
+        int randomX;
+        int randomY;
+        randomXY(randomX, randomY);
+        chooseXY(randomX, randomY, itemVector);
+
         Actor* newBoulder = new Boulder( this, randomX ,randomY );
         itemVector.push_back(newBoulder);
     }
     for( int i = 0; i < G; i++ )
     {
-        int randomX = rand()%(VIEW_WIDTH-4);
-        int randomY = rand()% (VIEW_HEIGHT - 8);
+        int randomX;
+        int randomY;
+        randomXY(randomX, randomY);
+        chooseXY(randomX, randomY, itemVector);
+        
         Actor* newNugget = new GoldNugget( this, randomX, randomY, false );
         itemVector.push_back(newNugget);
     }
     for( int i = 0; i < L; i++ )
     {
-        int randomX = rand()%(VIEW_WIDTH-4);
-        int randomY = rand()% (VIEW_HEIGHT - 8);
+        int randomX;
+        int randomY;
+        randomXY(randomX, randomY);
+        chooseXY(randomX, randomY, itemVector);
+        
         Actor* newBarrel = new OilBarrel( this, randomX, randomY );
         itemVector.push_back(newBarrel);
     }
@@ -90,8 +139,8 @@ int StudentWorld::move()
     fmPointer->move();
     
     int B = min(currentLevel / 2 + 2, 6);
-    int G = max(5 - currentLevel / 2, 2);
-    int L = min(2 + currentLevel, 20);
+    //int G = max(5 - currentLevel / 2, 2);
+    //int L = min(2 + currentLevel, 20);
     
     for( int i = 0; i < B; i++)
     {
@@ -118,29 +167,7 @@ void StudentWorld::addActor(Actor* a)
     
 }
 
-void StudentWorld::removeDirt(int startX, int startY)
-{
-    int endY = startY+3;
-    int endX = startX+3;
-    if(endY>=59)
-        endY = 59;
-    if(endX>= 63)
-        endX = 63;
-    for(int i = startX; i<= endX; i++)
-    {
-        for(int j = startY; j<= endY; j++)
-        {
-            if(dirtArray[i][j]!=nullptr)
-            {
-                delete dirtArray[i][j];
-                dirtArray[i][j]=nullptr;
-            }
-        }
-    }
-    //SINGLE STL
-}
-
-void StudentWorld::clearDirt(int startX, int startY)
+void StudentWorld::clearDirt(int startX, int startY, bool sound)
 {
     int endY = startY+3;
     int endX = startX+3;
@@ -156,7 +183,10 @@ void StudentWorld::clearDirt(int startX, int startY)
             {
                 delete dirtArray[i][j];
                 dirtArray[i][j]=nullptr;
-                playSound(SOUND_DIG);
+                if(sound)
+                {
+                    playSound(SOUND_DIG);
+                }
             }
         }
     }

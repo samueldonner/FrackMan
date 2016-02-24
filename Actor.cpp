@@ -171,7 +171,7 @@ void FrackMan::move()
         
         
     }
-    getWorld()->clearDirt(x, y);
+    getWorld()->clearDirt(x, y, true);
 
 }
 
@@ -248,7 +248,7 @@ void Dirt::move()
 Boulder::Boulder(StudentWorld* world, int startX, int startY)
 :Actor(world, startX, startY, down, true, IID_BOULDER, 1, 1)
 {
-    world->removeDirt(startX, startY);
+    world->clearDirt(startX, startY, false);
     m_state = 1;
     m_waitCounter = 0;
 }
@@ -290,6 +290,7 @@ void Boulder::move()
             else
             {
                 this->setDead();
+                delete this;
             }
         }
     }
