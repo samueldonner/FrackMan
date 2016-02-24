@@ -284,12 +284,12 @@ void Boulder::move()
         {
             if(getWorld()->canActorMoveTo(this, getX(), getY()) && getY() >=0) // runs into the top of another boulder
             {
+                std::cout<< "MOving";
                 moveTo(x,y-1);
             }
             else
             {
                 this->setDead();
-                delete this;
             }
         }
     }
@@ -300,3 +300,41 @@ bool Boulder::canActorsPassThroughMe() const
 {
     return false;
 }
+
+//================Squirt===================//================Squirt===================
+//================Squirt===================//================Squirt===================
+//================Squirt===================//================Squirt===================
+//================Squirt===================//================Squirt===================
+//================Squirt===================//================Squirt===================
+Squirt::Squirt(StudentWorld* world, int startX, int startY, Direction startDir)
+:Actor(world, startX, startY, down, true, IID_BOULDER, 1, 1)
+{
+    
+}
+void Squirt::move()
+{
+    
+}
+
+//================ActivatingObject===================//================ActivatingObject===================
+ActivatingObject::ActivatingObject(StudentWorld* world, int startX, int startY, int imageID,
+                 int soundToPlay, bool activateOnPlayer, bool activateOnProtester, bool initallyActive)
+:Actor(world, startX, startY, down, true, IID_BOULDER, 1, 1)
+{
+    
+}
+
+void ActivatingObject::move()
+{
+    
+}
+
+void ActivatingObject::setTicksToLive()
+{
+    
+}
+
+
+
+
+

@@ -1,10 +1,15 @@
 #include "StudentWorld.h"
 #include "Actor.h"
 #include <string>
+#include <cstdlib>
+#include <queue>
+#include <vector>
+#include <algorithm>
 #include <iostream>
 #include <sstream>  // defines the type std::ostringstream
 #include <iomanip>  // defines the manipulator setw
 using namespace std;
+using std::vector;
 
 GameWorld* createStudentWorld(string assetDir)
 {
@@ -34,7 +39,24 @@ int StudentWorld::init()
             }
             
         }
-    boulderPointer = new Boulder( this, 20,50 );
+    int currentLevel = getLevel();
+    int B = min(currentLevel / 2 + 2, 6);
+    int G = max(5 - currentLevel / 2, 2);
+    int L = min(2 + currentLevel, 20);
+    
+    vector<Actor> itemVector;
+    for( int i = 0; i < B; i++ )
+    {
+       itemVector.push_back(*new Boulder( this, 20,50 ));
+    }
+    for( int i = 0; i < G; i++ )
+    {
+        itemVector.push_back(*new GoldNugget( this, 20,50 ));
+    }
+    for( int i = 0; i < L; i++ )
+    {
+        boulderPointer = new Boulder( this, 20,50 );
+    }
     
     //boulderPointer = new Boulder( this, 20,10 );
     return GWSTATUS_CONTINUE_GAME;
@@ -59,10 +81,26 @@ int StudentWorld::move()
     
     fmPointer->move();
     
-    if( boulderPointer->isAlive())
+    if( boulderPointer->isAlive() == true )
+    {
         boulderPointer->move();
+    }
     
     return GWSTATUS_CONTINUE_GAME;
+}
+
+void StudentWorld::cleanUp()
+{
+    for(int i = 0; i< VIEW_WIDTH; i++)
+        for(int j = 0; j<VIEW_HEIGHT-4; j++)
+            delete dirtArray[i][j];
+    delete fmPointer;
+    delete boulderPointer;
+}
+
+void StudentWorld::addActor(Actor* a)
+{
+    
 }
 
 void StudentWorld::removeDirt(int startX, int startY)
@@ -128,17 +166,64 @@ bool StudentWorld::canActorMoveTo(Actor* a, int posX, int posY) const
     return canActorMove;
 }
 
+int StudentWorld::annoyAllNearbyActors(Actor* annoyer, int points, int radius)
+{
+    return 0;
+}
+
+void StudentWorld::revealAllNearbyObjects(int x, int y, int radius)
+{
+    
+}
+
+Actor* StudentWorld::findNearbyFrackMan(Actor* a, int radius) const
+{
+    return a;
+}
+
+void StudentWorld::annoyFrackMan()
+{
+    
+}
+
+void StudentWorld::giveFrackManSonar()
+{
+    
+}
+
+void StudentWorld::giveFrackManWater()
+{
+    
+}
+
+bool StudentWorld::facingTowardFrackMan(Actor* a) const
+{
+    return true;
+}
+
+//GraphObject::Direction StudentWorld::lineOfSightToFrackMan(Actor* a) const
+//{
+//
+//}
+
+bool StudentWorld::isNearFrackMan(Actor* a, int radius) const
+{
+    return true;
+}
+
+//GraphObject::Direction StudentWorld::determineFirstMoveToExit(int x, int y)
+//{
+//
+//}
+
+//GraphObject::Direction StudentWorld::determineFirstMoveToFrackMan(int x, int y)
+//{
+//
+//}
+
 StudentWorld::~StudentWorld()
 {
     for(int i = 0; i<VIEW_WIDTH; i++)
-        for(int j = 0; j<VIEW_HEIGHT-4; j++)
-            delete dirtArray[i][j];
-    delete fmPointer;
-}
-
-void StudentWorld::cleanUp()
-{
-    for(int i = 0; i< VIEW_WIDTH; i++)
         for(int j = 0; j<VIEW_HEIGHT-4; j++)
             delete dirtArray[i][j];
     delete fmPointer;
