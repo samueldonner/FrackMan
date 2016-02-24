@@ -289,8 +289,8 @@ void Boulder::move()
             }
             else
             {
-                this->setDead();
-                delete this;
+                setDead();
+                setVisible(false);
             }
         }
     }

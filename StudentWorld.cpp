@@ -91,7 +91,7 @@ int StudentWorld::init()
         randomXY(randomX, randomY);
         chooseXY(randomX, randomY, itemVector);
 
-        Actor* newBoulder = new Boulder( this, randomX ,randomY );
+        Actor* newBoulder = new Boulder( this, 10 ,10*(i+1) );
         itemVector.push_back(newBoulder);
     }
     for( int i = 0; i < G; i++ )
@@ -150,6 +150,13 @@ int StudentWorld::move()
         }
     }
     
+    for( int i = 0; i < itemVector.size(); i++ )
+    {
+        if(!(itemVector[i]->isAlive()))
+        {
+            itemVector.erase(itemVector.begin()+i);
+        }
+    }
     return GWSTATUS_CONTINUE_GAME;
 }
 
@@ -204,6 +211,16 @@ bool StudentWorld::canActorMoveTo(Actor* a, int posX, int posY) const
                 break;
             }
     }
+    
+    for(int i = 0; i < itemVector.size(); i++)
+    {
+        if(posY-4 == itemVector[i]->getY() && itemVector[i]->canActorsPassThroughMe() == false)
+        {
+            canActorMove = false;
+        }
+    
+    }
+    
     if(posY <= 0 || posY >= 59 || posX <= 0 || posX >= 63)
     {
         canActorMove = false;
@@ -273,4 +290,5 @@ StudentWorld::~StudentWorld()
         for(int j = 0; j<VIEW_HEIGHT-4; j++)
             delete dirtArray[i][j];
     delete fmPointer;
+    
 }
