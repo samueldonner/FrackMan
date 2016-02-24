@@ -120,7 +120,7 @@ void FrackMan::move()
 {
     int x = getX();
     int y = getY();
-    if(!isAlive()) //frackman is not alive
+    if(!isAlive() ) //frackman is not alive
         return;
     else
     {
@@ -284,7 +284,6 @@ void Boulder::move()
         {
             if(getWorld()->canActorMoveTo(this, getX(), getY()) && getY() >=0) // runs into the top of another boulder
             {
-                std::cout<< "Moving";
                 moveTo(x,y-1);
             }
             else

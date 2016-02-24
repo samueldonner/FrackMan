@@ -30,7 +30,8 @@ public:
     
     // Clear a 4x4 region of dirt.
     void clearDirt(int x, int y, bool sound);  // DONE!!!
-    void removeDirt(int x, int y);  // DONE!!!
+    
+    void setXY(std::string actorType);
     
     // Can actor move to x,y?
     bool canActorMoveTo(Actor* a, int x, int y) const;

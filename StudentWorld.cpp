@@ -63,6 +63,47 @@ void chooseXY( int &randomX, int &randomY, vector<Actor*> itemVector)
     }
 }
 
+void StudentWorld::setXY(string actorType)
+{
+    int randomX = 0;
+    int randomY = 0;
+    int counter = 0;
+    Actor* actor;
+    
+    if(actorType == "B")
+    {
+        counter = min(currentLevel / 2 + 2, 6);
+    }
+    else if(actorType == "G")
+    {
+        counter = max(5 - currentLevel / 2, 2);
+    }
+    else if(actorType == "L")
+    {
+        counter = min(2 + currentLevel, 20);
+    }
+    
+    for(int i =0; i < counter; i++)
+    {
+        randomXY(randomX, randomY);
+        chooseXY(randomX, randomY, itemVector);
+        if(actorType == "B")
+        {
+            actor = new Boulder( this, randomX , randomY);
+        }
+        else if(actorType == "G")
+        {
+            actor = new GoldNugget( this, randomX, randomY, false );
+        }
+        else if(actorType == "L")
+        {
+            actor = new OilBarrel( this, randomX, randomY );
+        }
+        itemVector.push_back(actor);
+    }
+    
+    
+}
 
 int StudentWorld::init()
 {
@@ -80,40 +121,10 @@ int StudentWorld::init()
             
         }
     int currentLevel = getLevel();
-    int B = min(currentLevel / 2 + 2, 6);
-    int G = max(5 - currentLevel / 2, 2);
-    int L = min(2 + currentLevel, 20);
     
-    for( int i = 0; i < B; i++ )
-    {
-        int randomX;
-        int randomY;
-        randomXY(randomX, randomY);
-        chooseXY(randomX, randomY, itemVector);
-
-        Actor* newBoulder = new Boulder( this, 10 ,10*(i+1) );
-        itemVector.push_back(newBoulder);
-    }
-    for( int i = 0; i < G; i++ )
-    {
-        int randomX;
-        int randomY;
-        randomXY(randomX, randomY);
-        chooseXY(randomX, randomY, itemVector);
-        
-        Actor* newNugget = new GoldNugget( this, randomX, randomY, false );
-        itemVector.push_back(newNugget);
-    }
-    for( int i = 0; i < L; i++ )
-    {
-        int randomX;
-        int randomY;
-        randomXY(randomX, randomY);
-        chooseXY(randomX, randomY, itemVector);
-        
-        Actor* newBarrel = new OilBarrel( this, randomX, randomY );
-        itemVector.push_back(newBarrel);
-    }
+    setXY("B");
+    setXY("G");
+    setXY("L");
     
     //boulderPointer = new Boulder( this, 20,10 );
     return GWSTATUS_CONTINUE_GAME;
@@ -166,7 +177,6 @@ void StudentWorld::cleanUp()
         for(int j = 0; j<VIEW_HEIGHT-4; j++)
             delete dirtArray[i][j];
     delete fmPointer;
-    delete boulderPointer;
 }
 
 void StudentWorld::addActor(Actor* a)
@@ -214,7 +224,7 @@ bool StudentWorld::canActorMoveTo(Actor* a, int posX, int posY) const
     
     for(int i = 0; i < itemVector.size(); i++)
     {
-        if(posY-4 == itemVector[i]->getY() && itemVector[i]->canActorsPassThroughMe() == false)
+        if(posY-4 == itemVector[i]->getY() && posX-3<=itemVector[i]->getX() && posX+3>=itemVector[i]->getX() && itemVector[i]->canActorsPassThroughMe() == false)
         {
             canActorMove = false;
         }
