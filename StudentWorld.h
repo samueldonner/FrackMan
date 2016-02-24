@@ -7,6 +7,7 @@
 #include "GraphObject.h"
 #include "GameWorld.h"
 #include <string>
+#include <vector>
 #include <list>
 
 class Actor;
@@ -81,6 +82,7 @@ private:
     FrackMan* fmPointer;
     Boulder* boulderPointer;
     Dirt* dirtArray[VIEW_WIDTH][VIEW_HEIGHT-4];
+    std::vector<Actor*> itemVector;
 };
 
 #endif // STUDENTWORLD_H_

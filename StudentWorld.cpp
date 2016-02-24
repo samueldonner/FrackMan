@@ -44,18 +44,26 @@ int StudentWorld::init()
     int G = max(5 - currentLevel / 2, 2);
     int L = min(2 + currentLevel, 20);
     
-    vector<Actor> itemVector;
     for( int i = 0; i < B; i++ )
     {
-       itemVector.push_back(*new Boulder( this, 20,50 ));
+        int randomX = rand()%(VIEW_WIDTH-4);
+        int randomY = rand()% (VIEW_HEIGHT - 8);
+        Actor* newBoulder = new Boulder( this, randomX ,randomY );
+        itemVector.push_back(newBoulder);
     }
     for( int i = 0; i < G; i++ )
     {
-        itemVector.push_back(*new GoldNugget( this, 20,50 ));
+        int randomX = rand()%(VIEW_WIDTH-4);
+        int randomY = rand()% (VIEW_HEIGHT - 8);
+        Actor* newNugget = new GoldNugget( this, randomX, randomY, false );
+        itemVector.push_back(newNugget);
     }
     for( int i = 0; i < L; i++ )
     {
-        boulderPointer = new Boulder( this, 20,50 );
+        int randomX = rand()%(VIEW_WIDTH-4);
+        int randomY = rand()% (VIEW_HEIGHT - 8);
+        Actor* newBarrel = new OilBarrel( this, randomX, randomY );
+        itemVector.push_back(newBarrel);
     }
     
     //boulderPointer = new Boulder( this, 20,10 );
@@ -81,9 +89,16 @@ int StudentWorld::move()
     
     fmPointer->move();
     
-    if( boulderPointer->isAlive() == true )
+    int B = min(currentLevel / 2 + 2, 6);
+    int G = max(5 - currentLevel / 2, 2);
+    int L = min(2 + currentLevel, 20);
+    
+    for( int i = 0; i < B; i++)
     {
-        boulderPointer->move();
+        if( itemVector[i]->isAlive() == true )
+        {
+            itemVector[i]->move();
+        }
     }
     
     return GWSTATUS_CONTINUE_GAME;
@@ -122,6 +137,7 @@ void StudentWorld::removeDirt(int startX, int startY)
             }
         }
     }
+    //SINGLE STL
 }
 
 void StudentWorld::clearDirt(int startX, int startY)

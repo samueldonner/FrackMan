@@ -284,7 +284,7 @@ void Boulder::move()
         {
             if(getWorld()->canActorMoveTo(this, getX(), getY()) && getY() >=0) // runs into the top of another boulder
             {
-                std::cout<< "MOving";
+                std::cout<< "Moving";
                 moveTo(x,y-1);
             }
             else
@@ -306,8 +306,9 @@ bool Boulder::canActorsPassThroughMe() const
 //================Squirt===================//================Squirt===================
 //================Squirt===================//================Squirt===================
 //================Squirt===================//================Squirt===================
+
 Squirt::Squirt(StudentWorld* world, int startX, int startY, Direction startDir)
-:Actor(world, startX, startY, down, true, IID_BOULDER, 1, 1)
+:Actor(world, startX, startY, down, true, IID_SONAR, 1, 1)
 {
     
 }
@@ -317,9 +318,14 @@ void Squirt::move()
 }
 
 //================ActivatingObject===================//================ActivatingObject===================
+//================ActivatingObject===================//================ActivatingObject===================
+//================ActivatingObject===================//================ActivatingObject===================
+//================ActivatingObject===================//================ActivatingObject===================
+//================ActivatingObject===================//================ActivatingObject===================
+
 ActivatingObject::ActivatingObject(StudentWorld* world, int startX, int startY, int imageID,
                  int soundToPlay, bool activateOnPlayer, bool activateOnProtester, bool initallyActive)
-:Actor(world, startX, startY, down, true, IID_BOULDER, 1, 1)
+:Actor(world, startX, startY, right, true, imageID, 1, 1)
 {
     
 }
@@ -335,6 +341,78 @@ void ActivatingObject::setTicksToLive()
 }
 
 
+//================OilBarrel===================//================OilBarrel===================
+//================OilBarrel===================//================OilBarrel===================
+//================OilBarrel===================//================OilBarrel===================
+//================OilBarrel===================//================OilBarrel===================
+//================OilBarrel===================//================OilBarrel===================
+OilBarrel::OilBarrel(StudentWorld* world, int startX, int startY)
+:ActivatingObject(world, startX, startY, IID_BARREL,
+SOUND_FOUND_OIL, true, false, false)
+{
+    
+}
+
+void OilBarrel::move()
+{
+    
+}
+
+bool OilBarrel::needsToBePickedUpToFinishLevel() const
+{
+    return true;
+}
 
 
+//================GoldNugget===================//================GoldNugget===================
+//================GoldNugget===================//================GoldNugget===================
+//================GoldNugget===================//================GoldNugget===================
+//================GoldNugget===================//================GoldNugget===================
+//================GoldNugget===================//================GoldNugget===================
+GoldNugget::GoldNugget(StudentWorld* world, int startX, int startY, bool temporary)
+:ActivatingObject(world, startX, startY, IID_GOLD,
+                  SOUND_GOT_GOODIE, true, false, false)
+{
+    
+}
 
+void GoldNugget::move()
+{
+    
+}
+
+//================SonarKit===================//================SonarKit===================
+//================SonarKit===================//================SonarKit===================
+//================SonarKit===================//================SonarKit===================
+//================SonarKit===================//================SonarKit===================
+//================SonarKit===================//================SonarKit===================
+//================SonarKit===================//================SonarKit===================
+SonarKit::SonarKit(StudentWorld* world, int startX, int startY)
+:ActivatingObject(world, startX, startY, IID_SONAR,
+                  SOUND_GOT_GOODIE, true, false, false)
+{
+    
+}
+
+void SonarKit::move()
+{
+    
+}
+
+
+//================WaterPool===================//================WaterPool===================
+//================WaterPool===================//================WaterPool===================
+//================WaterPool===================//================WaterPool===================
+//================WaterPool===================//================WaterPool===================
+//================WaterPool===================//================WaterPool===================
+//================WaterPool===================//================WaterPool===================s
+WaterPool::WaterPool(StudentWorld* world, int startX, int startY)
+:ActivatingObject(world, startX, startY, IID_WATER_POOL,
+                  SOUND_GOT_GOODIE, true, false, false)
+{
+    
+}
+void WaterPool::move()
+{
+    
+}
