@@ -1,6 +1,13 @@
 #include "Actor.h"
 #include "StudentWorld.h"
+#include <string>
+#include <cstdlib>
+#include <queue>
+#include <vector>
+#include <algorithm>
 #include <iostream>
+#include <sstream>  // defines the type std::ostringstream
+#include <iomanip>
 
 // Students:  Add code to this file (if you wish), Actor.h, StudentWorld.h, and StudentWorld.cpp
 
@@ -339,7 +346,7 @@ ActivatingObject::ActivatingObject(StudentWorld* world, int startX, int startY, 
 
 void ActivatingObject::move()
 {
-    m_activateOnPlayer =true;
+    m_activateOnPlayer = true;
     getWorld()->playSound(m_soundToPlay);
 }
 
@@ -361,7 +368,7 @@ SOUND_FOUND_OIL, true, false, false)
     std::cout<< "X:" << getX()<< std::endl;
     std::cout << "Y:" << getY()<< std::endl;
     m_alreadyVisible = false;
-    
+    m_barrelFound = false;
     
     
 }
@@ -378,14 +385,21 @@ void OilBarrel::move()
     }
     if(getWorld()->findNearbyFrackMan(this, 3)!=nullptr)
     {
+        m_barrelFound = true;
         setDead();
+        getWorld()->setScore(1000);
         ActivatingObject::move();
         
     }
 }
 
+
 bool OilBarrel::needsToBePickedUpToFinishLevel() const
 {
+    if( m_barrelFound == false )
+    {
+        return false;
+    }
     return true;
 }
 

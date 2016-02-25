@@ -14,6 +14,7 @@ class Actor;
 class FrackMan;
 class Boulder;
 class Dirt;
+class OilBarrel;
 
 class StudentWorld : public GameWorld
 {
@@ -60,6 +61,11 @@ public:
     // Give FrackMan some water.
     void giveFrackManWater();
     
+    //Set the Score
+    void setScore(int score);
+    
+    void oilLeft(int &oilLeft);
+    
     // Is the Actor a facing toward the FrackMan?
     bool facingTowardFrackMan(Actor* a) const;
     
@@ -80,8 +86,10 @@ public:
     
 private:
     int m_score;
+    int m_level;
+    int m_oilLeft;
     FrackMan* fmPointer;
-    Boulder* boulderPointer;
+    //Boulder* boulderPointer;
     Dirt* dirtArray[VIEW_WIDTH][VIEW_HEIGHT-4];
     std::vector<Actor*> itemVector;
 };

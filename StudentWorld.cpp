@@ -21,7 +21,8 @@ GameWorld* createStudentWorld(string assetDir)
 StudentWorld::StudentWorld(string assetDir)
 :GameWorld(assetDir)
 {
-    //currentLevel = 0;
+    m_score = 000000;
+    m_level = getLevel();
 }
 
 void randomXY( int &randomX, int &randomY)
@@ -61,23 +62,23 @@ void chooseXY( int &randomX, int &randomY, vector<Actor*> itemVector)
 
 void StudentWorld::setXY(string actorType)
 {
+    m_level = getLevel();
     int randomX = 0;
     int randomY = 0;
     int counter = 0;
-    int level = getLevel();
     Actor* actor;
     
     if(actorType == "B")
     {
-        counter = min(level / 2 + 2, 6);
+        counter = min(m_level / 2 + 2, 6);
     }
     else if(actorType == "G")
     {
-        counter = max(5 - level / 2, 2);
+        counter = max(5 - m_level / 2, 2);
     }
     else if(actorType == "L")
     {
-        counter = min(2 + level, 20);
+        counter = min(2 + m_level, 20);
     }
     
     for(int i =0; i < counter; i++)
@@ -129,18 +130,37 @@ int StudentWorld::init()
     return GWSTATUS_CONTINUE_GAME;
 }
 
+void StudentWorld::setScore(int score)
+{
+    m_score += score;
+}
+
+void StudentWorld::oilLeft(int &oilLeft)
+{
+    m_oilLeft = 0;
+    for( int i = 0; i < itemVector.size(); i++)
+    {
+        if( itemVector[i]->needsToBePickedUpToFinishLevel() == false)
+        {
+            m_oilLeft++;
+        }
+    }
+    oilLeft = m_oilLeft;
+}
+
 int StudentWorld::move()
 {
-    int score = 000000;
-    int level = getLevel();
+    int m_level = getLevel();
     int lives = getLives();
     int health = 80;
     int water = 20;
     int gold = 3;
     int sonar = 1;
-    int oilLeft = 2;
+    
+    int oilLeft;
+    StudentWorld::oilLeft(oilLeft);
     ostringstream gameStats;
-    gameStats << "Scr: " << score <<  " Lvl: " << level << " Lives: " << lives
+    gameStats << "Scr: " << m_score <<  " Lvl: " << m_level << " Lives: " << lives
             << " Hlth: " << health << "%" << " Wtr: " << water << " Gld: "
             << gold << " Sonar: " << sonar << " Oil Left: " << oilLeft;
     string s = gameStats.str();
@@ -148,7 +168,7 @@ int StudentWorld::move()
     
     fmPointer->move();
     
-    //int B = min(currentLevel / 2 + 2, 6);
+    int B = min(m_level / 2 + 2, 6);
     //int G = max(5 - currentLevel / 2, 2);
     //int L = min(2 + currentLevel, 20);
     
@@ -157,6 +177,7 @@ int StudentWorld::move()
     //    boulderPointer->move();
     //}
     
+    
     for( int i = 0; i < itemVector.size(); i++)
     {
         if( itemVector[i]->isAlive() == true )
@@ -164,6 +185,13 @@ int StudentWorld::move()
             itemVector[i]->move();
         }
     }
+    
+    if(oilLeft == 0)
+    {
+        playSound(SOUND_FINISHED_LEVEL);
+        return GWSTATUS_FINISHED_LEVEL;
+    }
+    
     
     for( int i = 0; i < itemVector.size(); i++ )
     {
@@ -182,6 +210,12 @@ void StudentWorld::cleanUp()
         for(int j = 0; j<VIEW_HEIGHT-4; j++)
             delete dirtArray[i][j];
     delete fmPointer;
+    //delete boulderPointer;
+    for( int i = 0; i < itemVector.size(); i++ )
+    {
+       itemVector[i]->setVisible(false);
+        itemVector.erase(itemVector.begin()+i);
+    }
 }
 
 void StudentWorld::addActor(Actor* a)

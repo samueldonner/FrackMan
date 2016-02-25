@@ -179,6 +179,7 @@ public:
     virtual bool needsToBePickedUpToFinishLevel() const;
 private:
     bool m_alreadyVisible;
+    bool m_barrelFound;
 };
 
 class GoldNugget : public ActivatingObject
