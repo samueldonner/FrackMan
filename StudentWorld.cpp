@@ -28,10 +28,13 @@ StudentWorld::StudentWorld(string assetDir)
 void randomXY( int &randomX, int &randomY)
 {
     randomX = rand()%(VIEW_WIDTH-3);
-    randomY = rand()% (VIEW_HEIGHT - 7);
+    randomY = rand()% (VIEW_HEIGHT - 27) + 20;
+    //TESTINGrandomX = rand()%(VIEW_WIDTH-47) + 40;
+    //TESTINGrandomY = rand()%(VIEW_HEIGHT - 57) + 50;
     while(randomX > 26 && randomX < 34 && randomY > 0)
     {
         randomX = rand()%(VIEW_WIDTH-3);
+        //TESTINGrandomX = rand()%(VIEW_WIDTH-47) + 40;
     }
 }
 
@@ -45,19 +48,23 @@ double actorDistance(int xPosition, int yPosition, Actor* object2)
 
 void chooseXY( int &randomX, int &randomY, vector<Actor*> itemVector)
 {
-    if(itemVector.size()>1)
-    {
-        int index =0;
+    int index =0;
         while( index < itemVector.size() )
         {
+            //bool check=true;
+            //randomXY(randomX, randomY);
             while( actorDistance(randomX, randomY, itemVector[index])<=6 )
             {
                 randomXY(randomX, randomY);
                 index = 0;
             }
+            
+            //cout<< " to "<<index+1<<": "<<actorDistance(randomX, randomY, itemVector[index])<<endl;
+            //cout<<endl;
             index++;
         }
-    }
+    
+    
 }
 
 void StudentWorld::setXY(string actorType)
@@ -71,6 +78,7 @@ void StudentWorld::setXY(string actorType)
     if(actorType == "B")
     {
         counter = min(m_level / 2 + 2, 6);
+        //TESTINGcounter = 2;
     }
     else if(actorType == "G")
     {
@@ -79,6 +87,7 @@ void StudentWorld::setXY(string actorType)
     else if(actorType == "L")
     {
         counter = min(2 + m_level, 20);
+        //TESTINGcounter = 1;
     }
     
     for(int i =0; i < counter; i++)
@@ -91,15 +100,24 @@ void StudentWorld::setXY(string actorType)
         }
         else if(actorType == "G")
         {
-            actor = new GoldNugget( this, randomX, randomY, false );
+            actor = new GoldNugget( this, randomX, randomY, false, fmPointer );
             //actor->setVisible(false);
         }
         else if(actorType == "L")
         {
-            actor = new OilBarrel( this, randomX, randomY );
+            actor = new OilBarrel( this, randomX, randomY, fmPointer );
             actor->setVisible(false);
+            //TESTINGactor->setVisible(true);
         }
         itemVector.push_back(actor);
+        for (int j=0; j<itemVector.size();j++)
+        {
+            int x2=itemVector[j]->getX();
+            int y2=itemVector[j]->getY();
+            double dist=sqrt(pow(x2-randomX, 2) + pow(y2-randomY, 2));
+            //cout<<i+1<<" toto "<<j+1<<": "<<dist<<endl;
+        }
+    //cout << i+1 << "  X: " << randomX << "  Y:" << randomY << endl;
     }
     
     
@@ -148,19 +166,50 @@ void StudentWorld::oilLeft(int &oilLeft)
     oilLeft = m_oilLeft;
 }
 
+
 int StudentWorld::move()
 {
     int m_level = getLevel();
     int lives = getLives();
     int health = 80;
     int water = 20;
-    int gold = 3;
+    int gold = fmPointer->getGold();
     int sonar = 1;
     
     int oilLeft;
     StudentWorld::oilLeft(oilLeft);
+    
+    ostringstream gameScore;
+    if(m_score <= 9 )
+    {
+        gameScore<<"00000"<<m_score;
+    }
+    else if(m_score<=99)
+    {
+        gameScore<<"0000"<<m_score;
+    }
+    else if(m_score<=999)
+    {
+        gameScore<<"000"<<m_score;
+    }
+    else if(m_score<=9999)
+    {
+        gameScore<<"00"<<m_score;
+    }
+    else if(m_score<=99999)
+    {
+        gameScore<<"0"<<m_score;
+    }
+    else
+    {
+        gameScore<<m_score;
+    }
+    
+    string gameScoreString = gameScore.str();
+    
+    
     ostringstream gameStats;
-    gameStats << "Scr: " << m_score <<  " Lvl: " << m_level << " Lives: " << lives
+    gameStats << "Scr: " << gameScoreString <<  " Lvl: " << m_level << " Lives: " << lives
             << " Hlth: " << health << "%" << " Wtr: " << water << " Gld: "
             << gold << " Sonar: " << sonar << " Oil Left: " << oilLeft;
     string s = gameStats.str();
@@ -168,14 +217,9 @@ int StudentWorld::move()
     
     fmPointer->move();
     
-    int B = min(m_level / 2 + 2, 6);
+    //int B = min(m_level / 2 + 2, 6);
     //int G = max(5 - currentLevel / 2, 2);
     //int L = min(2 + currentLevel, 20);
-    
-    //if( boulderPointer->isAlive() == true )
-    //{
-    //    boulderPointer->move();
-    //}
     
     
     for( int i = 0; i < itemVector.size(); i++)
@@ -208,13 +252,16 @@ void StudentWorld::cleanUp()
 {
     for(int i = 0; i< VIEW_WIDTH; i++)
         for(int j = 0; j<VIEW_HEIGHT-4; j++)
+        {
             delete dirtArray[i][j];
+        }
     delete fmPointer;
     //delete boulderPointer;
     for( int i = 0; i < itemVector.size(); i++ )
     {
-       itemVector[i]->setVisible(false);
+        delete itemVector[i];
         itemVector.erase(itemVector.begin()+i);
+        i--;
     }
 }
 
@@ -261,9 +308,9 @@ bool StudentWorld::canActorMoveTo(Actor* a, int posX, int posY, bool isAgent, Gr
             
             if(itemVector[i]->canActorsPassThroughMe() == false)
             {
-                cout << "PosY: " << posY << endl;
+                //cout << "PosY: " << posY << endl;
                 //cout << "itemVector[i]->getY(): " << itemVector[i]->getY() << endl;
-                cout << "PosX: " << posX << endl;
+                //cout << "PosX: " << posX << endl;
                 //cout << "itemVector[i]->getX(): " << itemVector[i]->getX() << endl;
                 
                 if( dir == GraphObject::up && ((posX-3 <= itemVector[i]->getX() && posX+3 >= itemVector[i]->getX() && posY == itemVector[i]->getY()-4) || posY >= 60))
@@ -305,7 +352,7 @@ bool StudentWorld::canActorMoveTo(Actor* a, int posX, int posY, bool isAgent, Gr
             }
         
         }
-        if(posY < 0 || posY > 60 || posX < 0 || posX > 63)
+        if(posY <= 0 || posY > 60 || posX < 0 || posX >= 63)
         {
             //cout << "end of gameWorld";
             canActorMove = false;

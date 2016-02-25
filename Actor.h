@@ -95,6 +95,7 @@ public:
     unsigned int getWater() const;
 private:
     bool makingMove;
+    int m_goldAmount;
 };
 
 class Protester : public Agent
@@ -160,8 +161,9 @@ class ActivatingObject : public Actor
 public:
     ActivatingObject(StudentWorld* world, int startX, int startY, int imageID,
                      int soundToPlay, bool activateOnPlayer,
-                     bool activateOnProtester, bool initallyActive);
+                     bool activateOnProtester, bool initallyActive, FrackMan* fmpointer);
     virtual void move();
+    FrackMan* getFrackMan();
     
     // Set number of ticks until this object dies
     void setTicksToLive();
@@ -169,12 +171,13 @@ private:
     int m_soundToPlay;
     bool m_activateOnPlayer;
     bool m_initallyActive;
+    FrackMan* m_fmPointer;
 };
 
 class OilBarrel : public ActivatingObject
 {
 public:
-    OilBarrel(StudentWorld* world, int startX, int startY);
+    OilBarrel(StudentWorld* world, int startX, int startY, FrackMan* fmPointer);
     virtual void move();
     virtual bool needsToBePickedUpToFinishLevel() const;
 private:
@@ -185,21 +188,26 @@ private:
 class GoldNugget : public ActivatingObject
 {
 public:
-    GoldNugget(StudentWorld* world, int startX, int startY, bool temporary);
+    GoldNugget(StudentWorld* world, int startX, int startY, bool temporary, FrackMan* fmPointer);
     virtual void move();
+private:
+    bool m_alreadyVisible;
+    bool m_nuggetFound;
+    int m_soundNugget;
+
 };
 
 class SonarKit : public ActivatingObject
 {
 public:
-    SonarKit(StudentWorld* world, int startX, int startY);
+    SonarKit(StudentWorld* world, int startX, int startY, FrackMan* fmPointer);
     virtual void move();
 };
 
 class WaterPool : public ActivatingObject
 {
 public:
-    WaterPool(StudentWorld* world, int startX, int startY);
+    WaterPool(StudentWorld* world, int startX, int startY, FrackMan* fmPointer);
     virtual void move();
 };
 

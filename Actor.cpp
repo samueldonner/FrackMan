@@ -121,6 +121,7 @@ FrackMan::FrackMan(StudentWorld* world, int startX, int startY)
 {
     setDirection(right);
     makingMove = false;
+    m_goldAmount = 0;
 }
 
 void FrackMan::move()
@@ -198,7 +199,7 @@ bool FrackMan::annoy(unsigned int amount)
 
 void FrackMan::addGold()
 {
-    //TO DO:
+    m_goldAmount++;
 }
 
 bool FrackMan::canDigThroughDirt() const
@@ -207,20 +208,19 @@ bool FrackMan::canDigThroughDirt() const
 }
 
 
-void addSonar()
+void FrackMan::addSonar()
 {
     //TO DO:
 }
 
-void addWater()
+void FrackMan::addWater()
 {
     //TO DO:
 }
 
 unsigned int FrackMan::getGold() const
 {
-    //TO DO:
-    return 0;
+    return m_goldAmount;
 }
 
 unsigned int FrackMan::getSonar() const
@@ -337,11 +337,12 @@ void Squirt::move()
 //================ActivatingObject===================//================ActivatingObject===================
 
 ActivatingObject::ActivatingObject(StudentWorld* world, int startX, int startY, int imageID,
-                 int soundToPlay, bool activateOnPlayer, bool activateOnProtester, bool initallyActive)
+                 int soundToPlay, bool activateOnPlayer, bool activateOnProtester, bool initallyActive, FrackMan* fmPointer)
 :Actor(world, startX, startY, right, true, imageID, 1, 2)
 {
     m_soundToPlay = soundToPlay;
     m_activateOnPlayer = activateOnPlayer;
+    m_fmPointer = fmPointer;
 }
 
 void ActivatingObject::move()
@@ -355,22 +356,25 @@ void ActivatingObject::setTicksToLive()
     
 }
 
+FrackMan* ActivatingObject::getFrackMan()
+{
+    return m_fmPointer;
+}
+
 
 //================OilBarrel===================//================OilBarrel===================
 //================OilBarrel===================//================OilBarrel===================
 //================OilBarrel===================//================OilBarrel===================
 //================OilBarrel===================//================OilBarrel===================
 //================OilBarrel===================//================OilBarrel===================
-OilBarrel::OilBarrel(StudentWorld* world, int startX, int startY)
+OilBarrel::OilBarrel(StudentWorld* world, int startX, int startY, FrackMan* fmPointer)
 :ActivatingObject(world, startX, startY, IID_BARREL,
-SOUND_FOUND_OIL, true, false, false)
+SOUND_FOUND_OIL, true, false, false, fmPointer)
 {
-    std::cout<< "X:" << getX()<< std::endl;
-    std::cout << "Y:" << getY()<< std::endl;
+    //std::cout<< "X:" << getX()<< std::endl;
+    //std::cout << "Y:" << getY()<< std::endl;
     m_alreadyVisible = false;
     m_barrelFound = false;
-    
-    
 }
 
 void OilBarrel::move()
@@ -409,17 +413,46 @@ bool OilBarrel::needsToBePickedUpToFinishLevel() const
 //================GoldNugget===================//================GoldNugget===================
 //================GoldNugget===================//================GoldNugget===================
 //================GoldNugget===================//================GoldNugget===================
-GoldNugget::GoldNugget(StudentWorld* world, int startX, int startY, bool temporary)
+GoldNugget::GoldNugget(StudentWorld* world, int startX, int startY, bool temporary, FrackMan* fmPointer)
 :ActivatingObject(world, startX, startY, IID_GOLD,
-                  SOUND_GOT_GOODIE, true, false, false)
+                  SOUND_NONE, true, false, false, fmPointer)
 {
-    
+    if( temporary == true )
+    {
+        this->setVisible(true);
+        m_alreadyVisible = true;
+        m_soundNugget = SOUND_PROTESTER_FOUND_GOLD;
+    }
+    else
+    {
+        this->setVisible(false);
+        m_alreadyVisible = false;
+        m_soundNugget = SOUND_GOT_GOODIE;
+    }
 }
 
 void GoldNugget::move()
 {
-    
+    if(!isAlive() ) //frackman is not alive
+        return;
+    if(getWorld()->findNearbyFrackMan(this, 4)!=nullptr && m_alreadyVisible == false)
+    {
+        getWorld()->findNearbyFrackMan(this, 4)->setVisible(true);
+        m_alreadyVisible = true;
+        return;
+    }
+    if(getWorld()->findNearbyFrackMan(this, 3)!=nullptr)
+    {
+        getFrackMan()->addGold();
+        getWorld()->playSound(m_soundNugget);
+        m_nuggetFound = true;
+        setDead();
+        getWorld()->setScore(10);
+        ActivatingObject::move();
+    }
 }
+
+
 
 //================SonarKit===================//================SonarKit===================
 //================SonarKit===================//================SonarKit===================
@@ -427,9 +460,9 @@ void GoldNugget::move()
 //================SonarKit===================//================SonarKit===================
 //================SonarKit===================//================SonarKit===================
 //================SonarKit===================//================SonarKit===================
-SonarKit::SonarKit(StudentWorld* world, int startX, int startY)
+SonarKit::SonarKit(StudentWorld* world, int startX, int startY, FrackMan* fmPointer)
 :ActivatingObject(world, startX, startY, IID_SONAR,
-                  SOUND_GOT_GOODIE, true, false, false)
+                  SOUND_GOT_GOODIE, true, false, false, fmPointer)
 {
     
 }
@@ -446,9 +479,9 @@ void SonarKit::move()
 //================WaterPool===================//================WaterPool===================
 //================WaterPool===================//================WaterPool===================
 //================WaterPool===================//================WaterPool===================s
-WaterPool::WaterPool(StudentWorld* world, int startX, int startY)
+WaterPool::WaterPool(StudentWorld* world, int startX, int startY, FrackMan* fmPointer)
 :ActivatingObject(world, startX, startY, IID_WATER_POOL,
-                  SOUND_GOT_GOODIE, true, false, false)
+                  SOUND_GOT_GOODIE, true, false, false, fmPointer)
 {
     
 }

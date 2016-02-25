@@ -66,6 +66,7 @@ public:
     
     void oilLeft(int &oilLeft);
     
+    
     // Is the Actor a facing toward the FrackMan?
     bool facingTowardFrackMan(Actor* a) const;
     
@@ -88,6 +89,7 @@ private:
     int m_score;
     int m_level;
     int m_oilLeft;
+    int m_gold;
     FrackMan* fmPointer;
     //Boulder* boulderPointer;
     Dirt* dirtArray[VIEW_WIDTH][VIEW_HEIGHT-4];
