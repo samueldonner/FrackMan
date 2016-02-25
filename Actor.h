@@ -165,6 +165,10 @@ public:
     
     // Set number of ticks until this object dies
     void setTicksToLive();
+private:
+    int m_soundToPlay;
+    bool m_activateOnPlayer;
+    bool m_initallyActive;
 };
 
 class OilBarrel : public ActivatingObject

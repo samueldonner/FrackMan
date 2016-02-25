@@ -34,7 +34,7 @@ public:
     void setXY(std::string actorType);
     
     // Can actor move to x,y?
-    bool canActorMoveTo(Actor* a, int x, int y) const;
+    bool canActorMoveTo(Actor* a, int x, int y, bool isAgent, GraphObject::Direction dir) const;
     
     // Annoy all other actors within radius of annoyer, returning the
     // number of actors annoyed.

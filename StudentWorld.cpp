@@ -30,16 +30,16 @@ void randomXY( int &randomX, int &randomY)
     randomY = rand()% (VIEW_HEIGHT - 7);
     while(randomX > 26 && randomX < 34 && randomY > 0)
     {
-        randomX = rand()%(VIEW_WIDTH-4);
+        randomX = rand()%(VIEW_WIDTH-3);
     }
 }
 
-bool moreThanSix(int xPosition, int yPosition, Actor* object2)
+bool moreThanRadius(int xPosition, int yPosition, Actor* object2, int radius)
 {
     double distanceX = (xPosition-object2->getX())*(xPosition-object2->getX());
     double distanceY = (yPosition-object2->getY())*(yPosition-object2->getY());
     double distance = sqrt(distanceX + distanceY);
-    if(distance <= 6)
+    if(distance <= radius)
     {
         return false;
     }
@@ -53,7 +53,7 @@ void chooseXY( int &randomX, int &randomY, vector<Actor*> itemVector)
         int index =0;
         while( index < itemVector.size() )
         {
-            while( !moreThanSix(randomX, randomY, itemVector[index]) )
+            while( !moreThanRadius(randomX, randomY, itemVector[index], 6) )
             {
                 randomXY(randomX, randomY);
                 index = 0;
@@ -94,10 +94,12 @@ void StudentWorld::setXY(string actorType)
         else if(actorType == "G")
         {
             actor = new GoldNugget( this, randomX, randomY, false );
+            //actor->setVisible(false);
         }
         else if(actorType == "L")
         {
             actor = new OilBarrel( this, randomX, randomY );
+            actor->setVisible(false);
         }
         itemVector.push_back(actor);
     }
@@ -120,7 +122,7 @@ int StudentWorld::init()
             }
             
         }
-    int currentLevel = getLevel();
+    //int currentLevel = getLevel();
     
     setXY("B");
     setXY("G");
@@ -133,8 +135,8 @@ int StudentWorld::init()
 int StudentWorld::move()
 {
     int score = 321000;
-    int level = 52;
-    int lives = 3;
+    int level = getLevel();
+    int lives = getLives();
     int health = 80;
     int water = 20;
     int gold = 3;
@@ -209,32 +211,72 @@ void StudentWorld::clearDirt(int startX, int startY, bool sound)
     }
 }
 
-bool StudentWorld::canActorMoveTo(Actor* a, int posX, int posY) const
+bool StudentWorld::canActorMoveTo(Actor* a, int posX, int posY, bool isAgent, GraphObject::Direction dir) const
 {
     bool canActorMove = true;
     
-    for(int i = posX; i<= posX+3; i++)
-    {
-            if(dirtArray[i][posY-1]!=nullptr)
-            {
-                canActorMove = false;
-                break;
-            }
-    }
     
-    for(int i = 0; i < itemVector.size(); i++)
+    if(isAgent)
     {
-        if(posY-4 == itemVector[i]->getY() && posX-3<=itemVector[i]->getX() && posX+3>=itemVector[i]->getX() && itemVector[i]->canActorsPassThroughMe() == false)
+        for(int i = 0; i < itemVector.size(); i++)
         {
-            canActorMove = false;
+            
+            
+            if(itemVector[i]->canActorsPassThroughMe() == false)
+            {
+                cout << "PosY: " << posY << endl;
+                //cout << "itemVector[i]->getY(): " << itemVector[i]->getY() << endl;
+                cout << "PosX: " << posX << endl;
+                //cout << "itemVector[i]->getX(): " << itemVector[i]->getX() << endl;
+                
+                if( dir == GraphObject::up && ((posX-3 <= itemVector[i]->getX() && posX+3 >= itemVector[i]->getX() && posY == itemVector[i]->getY()-4) || posY >= 60))
+                {
+                    canActorMove = false;
+                }
+                if( dir == GraphObject::down && ((posX-3 <= itemVector[i]->getX() && posX+3 >= itemVector[i]->getX() && posY-4 == itemVector[i]->getY()) || posY <= 0))
+                {
+                    canActorMove = false;
+                }
+                if( dir == GraphObject::left && ((posY-3 <= itemVector[i]->getY() && posY+3 >= itemVector[i]->getY() && posX-4 == itemVector[i]->getX()) || posX <= 0))
+                {
+                    canActorMove = false;
+                }
+                if( dir == GraphObject::right && ((posY-3 <= itemVector[i]->getY() && posY+3 >= itemVector[i]->getY() && posX == itemVector[i]->getX()-4) || posX >= 60))
+                {
+                    canActorMove = false;
+                }
+            }
+            
+        }
+    }
+    else
+    {
+        for(int i = posX; i<= posX+3; i++)
+        {
+                if(dirtArray[i][posY-1]!=nullptr)
+                {
+                    canActorMove = false;
+                    break;
+                }
         }
     
-    }
+        for(int i = 0; i < itemVector.size(); i++)
+        {
+            if(posY-4 == itemVector[i]->getY() && posX-3<=itemVector[i]->getX() && posX+3>=itemVector[i]->getX() && itemVector[i]->canActorsPassThroughMe() == false)
+            {
+                canActorMove = false;
+            }
+        
+        }
+        if(posY <= 0 || posY > 60 || posX <= 0 || posX >= 63)
+        {
+            //cout << "end of gameWorld";
+            canActorMove = false;
+        }
+        
+    } // end else;
+        
     
-    if(posY <= 0 || posY >= 59 || posX <= 0 || posX >= 63)
-    {
-        canActorMove = false;
-    }
 
     return canActorMove;
 }
@@ -246,12 +288,26 @@ int StudentWorld::annoyAllNearbyActors(Actor* annoyer, int points, int radius)
 
 void StudentWorld::revealAllNearbyObjects(int x, int y, int radius)
 {
-    
+    for(int i = 0; i < itemVector.size(); i++)
+    {
+        if( itemVector[i]->isAlive() == true && !moreThanRadius(x,y, itemVector[i], radius))
+        {
+            cout<< "getting warmer"<<endl;
+            itemVector[i]->setVisible(true);
+        }
+    }
 }
 
 Actor* StudentWorld::findNearbyFrackMan(Actor* a, int radius) const
 {
-    return a;
+    if( !moreThanRadius( a->getX(), a->getY(), fmPointer, radius) )
+    {
+        return a;
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 void StudentWorld::annoyFrackMan()

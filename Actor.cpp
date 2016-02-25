@@ -133,32 +133,38 @@ void FrackMan::move()
             switch(ch)
             {
                 case KEY_PRESS_LEFT:
-                    if( directionMoving == left && x!=0 )
+                    if( directionMoving == left && getWorld()->canActorMoveTo(this, x, y, true, left) )
+                    {
+                        //std::cout<< "canActorMoveis: "<< getWorld()->canActorMoveTo(this, x, y, true, left) << std::endl;
                         moveTo(x-1, y);
+                    }
                     else
+                    {
+                        //std::cout<< "canActorMoveis: "<< getWorld()->canActorMoveTo(this, x, y, true, left) << std::endl;
                         moveTo(x, y);
-                        setDirection(left);
+                    }
+                    setDirection(left);
                     break;
                 case KEY_PRESS_RIGHT:
-                    if( directionMoving == right && x!=60 )
+                    if( (directionMoving == right && getWorld()->canActorMoveTo(this, x, y, true, right)))
                         moveTo(x+1, y);
                     else
                         moveTo(x, y);
-                        setDirection(right);
+                    setDirection(right);
                     break;
                 case KEY_PRESS_DOWN:
-                    if( directionMoving == down && y!=0 )
+                    if( (directionMoving == down && getWorld()->canActorMoveTo(this, x, y, true, down)))
                         moveTo(x, y-1);
                     else
                         moveTo(x, y);
-                        setDirection(down);
+                    setDirection(down);
                     break;
                 case KEY_PRESS_UP:
-                    if( directionMoving == up && y!=60 )
+                    if( (directionMoving == up && getWorld()->canActorMoveTo(this, x, y, true, up)))
                         moveTo(x , y+1);
                     else
                         moveTo(x, y);
-                        setDirection(up);
+                    setDirection(up);
                     break;
                 case KEY_PRESS_SPACE:
                     //TODO:
@@ -264,7 +270,7 @@ void Boulder::move()
     {
         if(m_state == 1)
         {
-            if(getWorld()->canActorMoveTo(this, getX(), getY()))
+            if(getWorld()->canActorMoveTo(this, getX(), getY(), false, none))
             {
                 m_state = 2;
                 return;
@@ -282,7 +288,7 @@ void Boulder::move()
         }
         if( m_state == 3 )
         {
-            if(getWorld()->canActorMoveTo(this, getX(), getY()) && getY() >=0) // runs into the top of another boulder
+            if(getWorld()->canActorMoveTo(this, getX(), getY(), false, none) && getY() >=0) // runs into the top of another boulder
             {
                 moveTo(x,y-1);
             }
@@ -327,12 +333,16 @@ ActivatingObject::ActivatingObject(StudentWorld* world, int startX, int startY, 
                  int soundToPlay, bool activateOnPlayer, bool activateOnProtester, bool initallyActive)
 :Actor(world, startX, startY, right, true, imageID, 1, 1)
 {
-    
+    m_soundToPlay = soundToPlay;
+    m_activateOnPlayer = activateOnPlayer;
 }
 
 void ActivatingObject::move()
 {
-    
+    if(m_activateOnPlayer == true)
+    {
+        getWorld()->playSound(m_soundToPlay);
+    }
 }
 
 void ActivatingObject::setTicksToLive()
@@ -350,12 +360,21 @@ OilBarrel::OilBarrel(StudentWorld* world, int startX, int startY)
 :ActivatingObject(world, startX, startY, IID_BARREL,
 SOUND_FOUND_OIL, true, false, false)
 {
+    std::cout<< "X:" << getX()<< std::endl;
+    std::cout << "Y:" << getY()<< std::endl;
+    
+    
     
 }
 
 void OilBarrel::move()
 {
-    
+    if(!isAlive() ) //frackman is not alive
+        return;
+    if(getWorld()->findNearbyFrackMan(this, 4)!=nullptr)
+    {
+        getWorld()->findNearbyFrackMan(this, 4)->setVisible(true);
+    }
 }
 
 bool OilBarrel::needsToBePickedUpToFinishLevel() const
