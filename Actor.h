@@ -142,7 +142,6 @@ class Boulder : public Actor
 public:
     Boulder(StudentWorld* world, int startX, int startY);
     virtual void move();
-    virtual bool canActorsPassThroughMe() const;
 private:
     int m_state;
     int m_waitCounter;
@@ -177,6 +176,8 @@ public:
     OilBarrel(StudentWorld* world, int startX, int startY);
     virtual void move();
     virtual bool needsToBePickedUpToFinishLevel() const;
+private:
+    bool m_alreadyVisible;
 };
 
 class GoldNugget : public ActivatingObject

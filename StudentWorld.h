@@ -79,7 +79,7 @@ public:
     GraphObject::Direction determineFirstMoveToFrackMan(int x, int y);
     
 private:
-    int currentLevel;
+    int m_score;
     FrackMan* fmPointer;
     Boulder* boulderPointer;
     Dirt* dirtArray[VIEW_WIDTH][VIEW_HEIGHT-4];

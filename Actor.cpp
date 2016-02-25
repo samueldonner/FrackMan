@@ -331,7 +331,7 @@ void Squirt::move()
 
 ActivatingObject::ActivatingObject(StudentWorld* world, int startX, int startY, int imageID,
                  int soundToPlay, bool activateOnPlayer, bool activateOnProtester, bool initallyActive)
-:Actor(world, startX, startY, right, true, imageID, 1, 1)
+:Actor(world, startX, startY, right, true, imageID, 1, 2)
 {
     m_soundToPlay = soundToPlay;
     m_activateOnPlayer = activateOnPlayer;
@@ -339,10 +339,8 @@ ActivatingObject::ActivatingObject(StudentWorld* world, int startX, int startY, 
 
 void ActivatingObject::move()
 {
-    if(m_activateOnPlayer == true)
-    {
-        getWorld()->playSound(m_soundToPlay);
-    }
+    m_activateOnPlayer =true;
+    getWorld()->playSound(m_soundToPlay);
 }
 
 void ActivatingObject::setTicksToLive()
@@ -362,6 +360,7 @@ SOUND_FOUND_OIL, true, false, false)
 {
     std::cout<< "X:" << getX()<< std::endl;
     std::cout << "Y:" << getY()<< std::endl;
+    m_alreadyVisible = false;
     
     
     
@@ -371,9 +370,17 @@ void OilBarrel::move()
 {
     if(!isAlive() ) //frackman is not alive
         return;
-    if(getWorld()->findNearbyFrackMan(this, 4)!=nullptr)
+    if(getWorld()->findNearbyFrackMan(this, 4)!=nullptr && m_alreadyVisible == false)
     {
         getWorld()->findNearbyFrackMan(this, 4)->setVisible(true);
+        m_alreadyVisible = true;
+        return;
+    }
+    if(getWorld()->findNearbyFrackMan(this, 3)!=nullptr)
+    {
+        setDead();
+        ActivatingObject::move();
+        
     }
 }
 

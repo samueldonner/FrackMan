@@ -21,7 +21,7 @@ GameWorld* createStudentWorld(string assetDir)
 StudentWorld::StudentWorld(string assetDir)
 :GameWorld(assetDir)
 {
-    currentLevel = 0;
+    //currentLevel = 0;
 }
 
 void randomXY( int &randomX, int &randomY)
@@ -34,16 +34,12 @@ void randomXY( int &randomX, int &randomY)
     }
 }
 
-bool moreThanRadius(int xPosition, int yPosition, Actor* object2, int radius)
+double actorDistance(int xPosition, int yPosition, Actor* object2)
 {
     double distanceX = (xPosition-object2->getX())*(xPosition-object2->getX());
     double distanceY = (yPosition-object2->getY())*(yPosition-object2->getY());
     double distance = sqrt(distanceX + distanceY);
-    if(distance <= radius)
-    {
-        return false;
-    }
-    return true;
+    return distance;
 }
 
 void chooseXY( int &randomX, int &randomY, vector<Actor*> itemVector)
@@ -53,7 +49,7 @@ void chooseXY( int &randomX, int &randomY, vector<Actor*> itemVector)
         int index =0;
         while( index < itemVector.size() )
         {
-            while( !moreThanRadius(randomX, randomY, itemVector[index], 6) )
+            while( actorDistance(randomX, randomY, itemVector[index])<=6 )
             {
                 randomXY(randomX, randomY);
                 index = 0;
@@ -68,19 +64,20 @@ void StudentWorld::setXY(string actorType)
     int randomX = 0;
     int randomY = 0;
     int counter = 0;
+    int level = getLevel();
     Actor* actor;
     
     if(actorType == "B")
     {
-        counter = min(currentLevel / 2 + 2, 6);
+        counter = min(level / 2 + 2, 6);
     }
     else if(actorType == "G")
     {
-        counter = max(5 - currentLevel / 2, 2);
+        counter = max(5 - level / 2, 2);
     }
     else if(actorType == "L")
     {
-        counter = min(2 + currentLevel, 20);
+        counter = min(2 + level, 20);
     }
     
     for(int i =0; i < counter; i++)
@@ -122,19 +119,19 @@ int StudentWorld::init()
             }
             
         }
-    //int currentLevel = getLevel();
     
     setXY("B");
     setXY("G");
     setXY("L");
     
-    //boulderPointer = new Boulder( this, 20,10 );
+    //boulderPointer = new Boulder( this, 0,56 );
+    
     return GWSTATUS_CONTINUE_GAME;
 }
 
 int StudentWorld::move()
 {
-    int score = 321000;
+    int score = 000000;
     int level = getLevel();
     int lives = getLives();
     int health = 80;
@@ -151,11 +148,16 @@ int StudentWorld::move()
     
     fmPointer->move();
     
-    int B = min(currentLevel / 2 + 2, 6);
+    //int B = min(currentLevel / 2 + 2, 6);
     //int G = max(5 - currentLevel / 2, 2);
     //int L = min(2 + currentLevel, 20);
     
-    for( int i = 0; i < B; i++)
+    //if( boulderPointer->isAlive() == true )
+    //{
+    //    boulderPointer->move();
+    //}
+    
+    for( int i = 0; i < itemVector.size(); i++)
     {
         if( itemVector[i]->isAlive() == true )
         {
@@ -167,6 +169,7 @@ int StudentWorld::move()
     {
         if(!(itemVector[i]->isAlive()))
         {
+            itemVector[i]->setVisible(false);
             itemVector.erase(itemVector.begin()+i);
         }
     }
@@ -268,7 +271,7 @@ bool StudentWorld::canActorMoveTo(Actor* a, int posX, int posY, bool isAgent, Gr
             }
         
         }
-        if(posY <= 0 || posY > 60 || posX <= 0 || posX >= 63)
+        if(posY < 0 || posY > 60 || posX < 0 || posX > 63)
         {
             //cout << "end of gameWorld";
             canActorMove = false;
@@ -290,7 +293,7 @@ void StudentWorld::revealAllNearbyObjects(int x, int y, int radius)
 {
     for(int i = 0; i < itemVector.size(); i++)
     {
-        if( itemVector[i]->isAlive() == true && !moreThanRadius(x,y, itemVector[i], radius))
+        if( itemVector[i]->isAlive() == true && actorDistance(x,y, itemVector[i])<=4)
         {
             cout<< "getting warmer"<<endl;
             itemVector[i]->setVisible(true);
@@ -300,8 +303,9 @@ void StudentWorld::revealAllNearbyObjects(int x, int y, int radius)
 
 Actor* StudentWorld::findNearbyFrackMan(Actor* a, int radius) const
 {
-    if( !moreThanRadius( a->getX(), a->getY(), fmPointer, radius) )
+    if( actorDistance( a->getX(), a->getY(), fmPointer) <= radius )
     {
+        cout<< "FoundOne" << endl;
         return a;
     }
     else
